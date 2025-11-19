@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🎄 Świąteczne Rebusy 🎅</title>
+<style>
+:root {
+  --bg1: #b31217;
+  --bg2: #1b5e20;
+  --card-bg: rgba(255 255 255 / 0.18);
+  --accent: #f9d342;
+}
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, var(--bg1), var(--bg2));
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+h1 {
+  text-align: center;
+  text-shadow: 3px 3px 6px #000;
+  margin-bottom: 36px;
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+}
+
+.card {
+  background: var(--card-bg);
+  border: 2px solid rgba(255 255 255 / 0.4);
+  border-radius: 20px;
+  box-shadow: 0 0 22px rgba(0,0,0,0.5);
+  max-width: 640px;
+  width: 100%;
+  padding: clamp(24px, 5vw, 40px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+  transition: all 0.4s ease;
+}
+
+.card img {
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  border: 3px solid rgba(255 255 255 / 0.5);
+  background: rgba(255 255 255 / 0.1);
+  max-height: 480px;
+  object-fit: contain;
+}
+
+h3 {
+  margin: 10px 0 4px;
+  font-size: clamp(1.4rem, 3.5vw, 1.8rem);
+}
+
+label {
+  font-weight: bold;
+  font-size: clamp(1.1rem, 2.8vw, 1.3rem);
+}
+
+input[type=text] {
+  width: 100%;
+  padding: 14px;
+  font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  text-transform: uppercase;
+  text-align: center;
+  background: rgba(255 255 255 / 0.9);
+  color: #222;
+}
+
+button {
+  background: var(--accent);
+  color: var(--bg2);
+  font-weight: 800;
+  padding: 14px 22px;
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  margin-top: 14px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 14px rgba(249, 211, 66, 0.8);
+}
+
+.msg {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 10px;
+  width: 100%;
+  text-align: center;
+  font-weight: 700;
+  font-size: clamp(1rem, 2.8vw, 1.3rem);
+}
+
+.hidden { display: none; }
+
+.solved {
+  background: rgba(255 255 255 / 0.3);
+  border: 2px solid rgba(255 255 255 / 0.45);
+  color: #fff;
+}
+
+.error {
+  background: rgba(255 0 0 / 0.35);
+  border: 2px solid rgba(255 255 255 / 0.45);
+  color: #fff;
+}
+
+footer {
+  margin-top: 30px;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  text-shadow: 1px 1px 2px #000;
+  color: rgba(255 255 255 / 0.8);
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  body { padding: 20px; }
+  .card { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<h1>🎅 Świąteczne Rebusy 🎁</h1>
+
+<main id="main"></main>
+
+<script>
+const rebuses = [
+  { id: 'r1', title: 'Rebus 1/2', image: 'images/rebus1.png', answer: 'MIKOŁAJ', message: '🎉 Brawo! Pierwszy rebus rozwiązany!' },
+  { id: 'r2', title: 'Rebus 2/2', image: 'images/rebus2.png', answer: 'CHOINKA', message: '🎄 Świetnie! Rozwiązałeś wszystkie rebusy!!' }
+];
+
+let current = 0;
+const main = document.getElementById('main');
+
+function placeholderSVG(title){
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='400'>
+    <rect width='100%' height='100%' fill='%23f1f5f9' rx='14'/>
+    <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='32' fill='%235a6572'>${title}</text>
+  </svg>`;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+
+function normalize(s){
+  if(!s) return '';
+  const map = {'ą':'a','ć':'c','ę':'e','ł':'l','ń':'n','ó':'o','ś':'s','ż':'z','ź':'z'};
+  s = s.trim().toLowerCase();
+  s = s.split('').map(ch => map[ch] || ch).join('');
+  return s;
+}
+
+function renderRebus(index){
+  const r = rebuses[index];
+  if(!r){
+    main.innerHTML = `
+      <div class="card">
+        <h2 style="font-size:clamp(1.6rem,5vw,2rem); text-shadow:2px 2px 4px #000;">🎉 Gratulacje! 🎉</h2>
+        <p style="font-size:clamp(1.2rem,3.5vw,1.5rem); margin-top:10px;">Sprawdź co kryje się za monsterą!</p>
+      </div>
+    `;
+    return;
+  }
+
+  main.innerHTML = `
+    <div class="card">
+      <img src="${r.image || placeholderSVG(r.title)}" alt="${r.title}" />
+      <h3>${r.title}</h3>
+      <label for="answer">Wpisz rozwiązanie</label>
+      <input id="answer" type="text" placeholder="Twoja odpowiedź..." />
+      <button id="checkBtn">Sprawdź</button>
+      <div id="feedback" class="msg hidden"></div>
+    </div>
+  `;
+
+  const answerInput = document.getElementById('answer');
+  const feedback = document.getElementById('feedback');
+  const btn = document.getElementById('checkBtn');
+
+  function checkAnswer() {
+    const val = normalize(answerInput.value);
+    if (val === normalize(r.answer)) {
+      feedback.textContent = r.message;
+      feedback.className = 'msg solved';
+      setTimeout(() => {
+        current++;
+        renderRebus(current);
+      }, 1700);
+    } else {
+      feedback.textContent = '❌ Źle, spróbuj ponownie!';
+      feedback.className = 'msg error';
+    }
+  }
+
+  // kliknięcie przycisku
+  btn.addEventListener('click', checkAnswer);
+
+  // naciśnięcie Entera w polu
+  answerInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      checkAnswer();
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderRebus(current);
+});
+</script>
+</body>
+</html>
